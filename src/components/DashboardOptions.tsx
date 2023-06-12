@@ -34,7 +34,16 @@ import CreateDialog from "@/components/dialog/CreateDialog";
 import EditDialog from "@/components/dialog/EditDialog";
 
 interface IDashboardOptionsProps {
-  onCardAdded: VoidFunction;
+  onCardAdded: () => Promise<void>;
+  onDashboardUpdate: ({
+    title,
+    description,
+  }: {
+    title: string;
+    description: string;
+  }) => void;
+  title: string;
+  description: string;
 }
 
 function DashboardOptions(props: IDashboardOptionsProps) {
@@ -48,7 +57,21 @@ function DashboardOptions(props: IDashboardOptionsProps) {
     setIsEditDialogOpen(false);
     setIsDeleteDialogOpen(false);
     setIsShareDialogOpen(false);
-    props.onCardAdded();
+    void props.onCardAdded();
+  }
+
+  function onDashboardUpdate({
+    title,
+    description,
+  }: {
+    title: string;
+    description: string;
+  }) {
+    setIsCreateDialogOpen(false);
+    setIsEditDialogOpen(false);
+    setIsDeleteDialogOpen(false);
+    setIsShareDialogOpen(false);
+    void props.onDashboardUpdate({ title, description });
   }
 
   return (
@@ -105,7 +128,11 @@ function DashboardOptions(props: IDashboardOptionsProps) {
         <CreateDialog onClose={onDialogClose} />
       </Dialog>
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <EditDialog />
+        <EditDialog
+          onUpdate={onDashboardUpdate}
+          title={props.title}
+          description={props.description}
+        />
       </Dialog>
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <ShareDialog />

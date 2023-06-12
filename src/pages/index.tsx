@@ -1,14 +1,40 @@
+import React from "react";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Card from "@/components/Card";
 import { api } from "@/utils/api";
 import DashboardOptions from "@/components/DashboardOptions";
+import Widget from "@/components/Widget";
+import Group from "@/components/Group";
+import QuickAction from "@/components/QuickAction";
+import { CommandDialog } from "@/components/ui/command";
+import { useHotkeys } from "react-hotkeys-hook";
 
 const Home: NextPage = () => {
   const cardsQuery = api.cards.getAll.useQuery();
 
-  async function onCardAdded() {
+  const [dashboardTitle, setDashboardTitle] =
+    React.useState<string>("Dashboard");
+  const [dashboardDescription, setDashboardDescription] =
+    React.useState<string>("This is a general description of the dashboard.");
+
+  const [isQuickActionsOpen, setIsQuickActionsOpen] = React.useState(false);
+
+  useHotkeys("mod+k", () => setIsQuickActionsOpen(true));
+
+  async function onCardAdded(): Promise<void> {
     await cardsQuery.refetch();
+  }
+
+  function onDashboardUpdate({
+    title,
+    description,
+  }: {
+    title: string;
+    description: string;
+  }): void {
+    setDashboardTitle(title);
+    setDashboardDescription(description);
   }
 
   return (
@@ -25,16 +51,47 @@ const Home: NextPage = () => {
               QuickLinks
             </h1>
             <div className="flex flex-row items-start gap-2">
-              <h2 className="text-2xl">Dashboard</h2>
-              <DashboardOptions onCardAdded={onCardAdded} />
+              <h2 className="text-2xl">{dashboardTitle}</h2>
+              <DashboardOptions
+                onCardAdded={onCardAdded}
+                onDashboardUpdate={onDashboardUpdate}
+                title={dashboardTitle}
+                description={dashboardDescription}
+              />
             </div>
           </div>
-          <div className="grid w-full grid-cols-6 gap-16">
+
+          <div className="grid w-full auto-rows-[12rem] grid-cols-6 gap-16">
             {cardsQuery.data?.map((card, i) => (
               <Card key={i} card={card} />
             ))}
+            <Widget
+              widget={{
+                name: "Widget",
+                description: "This is a widget.",
+                textColor: "#000000",
+                backgroundColor: "#FFFFFF",
+                size: "large",
+              }}
+            />
+            <Widget
+              widget={{
+                name: "Widget",
+                description: "This is a widget.",
+                textColor: "#000000",
+                backgroundColor: "#FFFFFF",
+                size: "medium",
+              }}
+            />
+            <Group name="Common Links" cards={cardsQuery.data ?? []} />
           </div>
         </div>
+        <CommandDialog
+          open={isQuickActionsOpen}
+          onOpenChange={setIsQuickActionsOpen}
+        >
+          <QuickAction />
+        </CommandDialog>
       </main>
     </>
   );

@@ -12,11 +12,13 @@ datasource db {
 }
 
 model Card {
-    id          String   @id @default(cuid())
-    name        String
-    description String
-    color       String
-    link        String
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    id              String   @id @default(cuid())
+    name            String
+    description     String
+    iconColor       String
+    backgroundColor String
+    link            String
+    icon            String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
 }

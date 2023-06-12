@@ -21,6 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Card from "../Card";
 import { api } from "@/utils/api";
+import IconPickerInput from "../IconPicker";
 
 const formSchema = z.object({
   name: z.string().nonempty("Please enter a name"),
@@ -29,10 +30,15 @@ const formSchema = z.object({
     .url("Please enter a valid URL")
     .nonempty("Please enter a link"),
   description: z.string().nonempty("Please enter a description"),
-  color: z
+  icon: z.string().nonempty("Please select an icon"),
+  iconColor: z
     .string()
     .regex(/^#[0-9a-f]{6}$/i, "Please enter a valid color")
-    .nonempty("Please enter a color"),
+    .nonempty("Please select a color for the icon"),
+  backgroundColor: z
+    .string()
+    .regex(/^#[0-9a-f]{6}$/i, "Please enter a valid color")
+    .nonempty("Please select a background color for the card"),
 });
 
 const placeholders = {
@@ -40,7 +46,9 @@ const placeholders = {
   link: "https://ietf.org",
   description:
     "The Internet Engineering Task Force is a non-profit standards organization.",
-  color: "#453225",
+  icon: "poo",
+  iconColor: "#ffffff",
+  backgroundColor: "#453225",
 };
 
 interface ICreateDialogProps {
@@ -58,14 +66,18 @@ function CreateDialog(props: ICreateDialogProps) {
       name: "",
       link: "",
       description: "",
-      color: "#000000",
+      icon: placeholders.icon,
+      iconColor: placeholders.iconColor,
+      backgroundColor: placeholders.backgroundColor,
     },
   });
 
   const previewName = form.watch("name");
   const previewLink = form.watch("link");
   const previewDescription = form.watch("description");
-  const previewColor = form.watch("color");
+  const previewIcon = form.watch("icon");
+  const previewIconColor = form.watch("iconColor");
+  const previewBackgroundColor = form.watch("backgroundColor");
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
@@ -86,42 +98,22 @@ function CreateDialog(props: ICreateDialogProps) {
         {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-8">
-            <div className="flex gap-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem className="flex-grow">
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder={placeholders.name} {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Choose a name and color for your card.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Color</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={placeholders.color}
-                        {...field}
-                        type="color"
-                        className="aspect-square w-12"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="flex-grow">
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder={placeholders.name} {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Choose a name for your card.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="link"
@@ -155,6 +147,63 @@ function CreateDialog(props: ICreateDialogProps) {
                 </FormItem>
               )}
             />
+            <div className="grid grid-cols-3 gap-8">
+              <FormField
+                control={form.control}
+                name="iconColor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Icon Color</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={placeholders.iconColor}
+                        {...field}
+                        type="color"
+                        className="h-16 w-full"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="backgroundColor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Background Color</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={placeholders.backgroundColor}
+                        {...field}
+                        type="color"
+                        className="h-16 w-full"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="icon"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Icon</FormLabel>
+                    <FormControl>
+                      <IconPickerInput
+                        placeholder={placeholders.icon}
+                        changeIcon={(value: string) =>
+                          form.setValue("icon", value)
+                        }
+                        value={field.value}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
           <div className="mt-8">
             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -164,8 +213,11 @@ function CreateDialog(props: ICreateDialogProps) {
               <Card
                 card={{
                   name: previewName || placeholders.name,
-                  color: previewColor || placeholders.color,
+                  iconColor: previewIconColor || placeholders.iconColor,
+                  backgroundColor:
+                    previewBackgroundColor || placeholders.backgroundColor,
                   link: previewLink || placeholders.link,
+                  icon: previewIcon || placeholders.icon,
                   description: previewDescription || placeholders.description,
                 }}
               />
