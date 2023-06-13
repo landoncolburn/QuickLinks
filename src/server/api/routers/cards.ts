@@ -2,11 +2,14 @@ import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 
 export const cardsRouter = createTRPCRouter({
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    const result = ctx.prisma.card.findMany();
-
-    return result;
-  }),
+  getAll: publicProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const result = ctx.prisma.card.findMany({
+        where: { dashboardId: input.id },
+      });
+      return result;
+    }),
   createCard: publicProcedure
     .input(
       z.object({
@@ -15,6 +18,7 @@ export const cardsRouter = createTRPCRouter({
         backgroundColor: z.string().startsWith("#").max(7),
         link: z.string().url(),
         description: z.string().min(1).max(255),
+        dashboard: z.string().uuid(),
         icon: z.string().min(1).max(255),
       })
     )
@@ -25,6 +29,7 @@ export const cardsRouter = createTRPCRouter({
         backgroundColor: input.backgroundColor,
         link: input.link,
         description: input.description,
+        dashboardId: input.dashboard,
         icon: input.icon,
       };
 

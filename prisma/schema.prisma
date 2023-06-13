@@ -12,13 +12,48 @@ datasource db {
 }
 
 model Card {
-    id              String   @id @default(cuid())
+    id              String    @id @default(cuid())
     name            String
     description     String
     iconColor       String
     backgroundColor String
     link            String
     icon            String
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
+    dashboard       Dashboard @relation(fields: [dashboardId], references: [id])
+    group           Group?    @relation(fields: [groupId], references: [id])
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    dashboardId     String
+    groupId         String?
+}
+
+model Dashboard {
+    id        String   @id @default(cuid())
+    name      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    cards     Card[]
+    groups    Group[]
+    widgets   Widget[]
+}
+
+model Group {
+    id          String    @id @default(cuid())
+    name        String
+    cards       Card[]
+    dashboard   Dashboard @relation(fields: [dashboardId], references: [id])
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    dashboardId String
+}
+
+model Widget {
+    id          String    @id @default(cuid())
+    name        String
+    type        String
+    config      String
+    dashboard   Dashboard @relation(fields: [dashboardId], references: [id])
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    dashboardId String
 }

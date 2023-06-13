@@ -53,6 +53,7 @@ const placeholders = {
 
 interface ICreateDialogProps {
   onClose: () => void;
+  dashboard: string;
 }
 
 function CreateDialog(props: ICreateDialogProps) {
@@ -82,7 +83,8 @@ function CreateDialog(props: ICreateDialogProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    await createCard.mutateAsync(values);
+    await createCard.mutateAsync({ ...values, dashboard: props.dashboard });
+    console.log(props.dashboard);
     form.reset();
   }
 

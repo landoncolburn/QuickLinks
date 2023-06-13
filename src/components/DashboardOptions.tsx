@@ -44,6 +44,7 @@ interface IDashboardOptionsProps {
   }) => void;
   title: string;
   description: string;
+  dashboard: string;
 }
 
 function DashboardOptions(props: IDashboardOptionsProps) {
@@ -125,7 +126,7 @@ function DashboardOptions(props: IDashboardOptionsProps) {
         </DropdownMenuContent>
       </DropdownMenu>
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <CreateDialog onClose={onDialogClose} />
+        <CreateDialog onClose={onDialogClose} dashboard={props.dashboard} />
       </Dialog>
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <EditDialog

@@ -1,17 +1,23 @@
+import { api } from "@/utils/api";
+import type { NextPage } from "next";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { type NextPage } from "next";
 import Head from "next/head";
 import Card from "@/components/Card";
-import { api } from "@/utils/api";
 import DashboardOptions from "@/components/DashboardOptions";
-import Widget from "@/components/Widget";
-import Group from "@/components/Group";
 import QuickAction from "@/components/QuickAction";
 import { CommandDialog } from "@/components/ui/command";
 import { useHotkeys } from "react-hotkeys-hook";
+import { z } from "zod";
 
-const Home: NextPage = () => {
-  const cardsQuery = api.cards.getAll.useQuery();
+const Dashboard: NextPage = () => {
+  const router = useRouter();
+  const dashboardId = router.query.id as string;
+
+  console.log(dashboardId);
+
+  const dashboard = api.dashboards.get.useQuery({ id: dashboardId });
+  const cardsQuery = api.cards.getAll.useQuery({ id: dashboardId });
 
   const [dashboardTitle, setDashboardTitle] = useState("Dashboard");
   const [isQuickActionsOpen, setIsQuickActionsOpen] = React.useState(false);
@@ -56,6 +62,7 @@ const Home: NextPage = () => {
                 onDashboardUpdate={onDashboardUpdate}
                 title={dashboardTitle}
                 description={dashboardDescription}
+                dashboard={dashboardId}
               />
             </div>
           </div>
@@ -64,25 +71,6 @@ const Home: NextPage = () => {
             {cardsQuery.data?.map((card, i) => (
               <Card key={i} card={card} />
             ))}
-            <Widget
-              widget={{
-                name: "Widget",
-                description: "This is a widget.",
-                textColor: "#000000",
-                backgroundColor: "#FFFFFF",
-                size: "large",
-              }}
-            />
-            <Widget
-              widget={{
-                name: "Widget",
-                description: "This is a widget.",
-                textColor: "#000000",
-                backgroundColor: "#FFFFFF",
-                size: "medium",
-              }}
-            />
-            <Group name="Common Links" cards={cardsQuery.data ?? []} />
           </div>
         </div>
         <CommandDialog
@@ -96,4 +84,4 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+export default Dashboard;
