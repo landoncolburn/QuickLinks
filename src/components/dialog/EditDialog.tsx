@@ -23,7 +23,7 @@ import { Textarea } from "../ui/Textarea";
 
 const formSchema = z.object({
   title: z.string().nonempty("Please enter a title"),
-  description: z.string().nonempty("Please enter a description"),
+  description: z.string().optional(),
 });
 
 interface IEditDialogProps {
@@ -32,10 +32,10 @@ interface IEditDialogProps {
     description,
   }: {
     title: string;
-    description: string;
+    description?: string;
   }) => void;
   title: string;
-  description: string;
+  description?: string;
 }
 
 function EditDialog(props: IEditDialogProps) {

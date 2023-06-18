@@ -1,29 +1,28 @@
 import { api } from "@/utils/api";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React from "react";
 import Head from "next/head";
-import Card from "@/components/Card";
+import LinkCard from "@/components/LinkCard";
 import DashboardOptions from "@/components/DashboardOptions";
 import QuickAction from "@/components/QuickAction";
 import { CommandDialog } from "@/components/ui/command";
 import { useHotkeys } from "react-hotkeys-hook";
-import { z } from "zod";
+import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowAltCircleLeft } from "@fortawesome/free-solid-svg-icons";
+import Widget from "@/components/Widget";
 
 const Dashboard: NextPage = () => {
   const router = useRouter();
   const dashboardId = router.query.id as string;
 
-  console.log(dashboardId);
-
   const dashboard = api.dashboards.get.useQuery({ id: dashboardId });
   const cardsQuery = api.cards.getAll.useQuery({ id: dashboardId });
+  const widgetsQuery = api.cards.getWidgets.useQuery({ id: dashboardId });
+  const mutation = api.dashboards.update.useMutation();
 
-  const [dashboardTitle, setDashboardTitle] = useState("Dashboard");
   const [isQuickActionsOpen, setIsQuickActionsOpen] = React.useState(false);
-  const [dashboardDescription, setDashboardDescription] = useState(
-    "This is a dashboard."
-  );
 
   useHotkeys("mod+k", () => setIsQuickActionsOpen(true));
 
@@ -31,15 +30,20 @@ const Dashboard: NextPage = () => {
     await cardsQuery.refetch();
   }
 
-  function onDashboardUpdate({
+  async function onDashboardUpdate({
     title,
     description,
   }: {
     title: string;
-    description: string;
-  }): void {
-    setDashboardTitle(title);
-    setDashboardDescription(description);
+    description?: string;
+  }): Promise<void> {
+    mutation.mutate({
+      id: dashboardId,
+      name: title,
+      description,
+    });
+    await dashboard.refetch();
+    router.reload();
   }
 
   return (
@@ -52,25 +56,54 @@ const Dashboard: NextPage = () => {
       <main className="flex min-h-screen flex-col items-center">
         <div className="container flex flex-col items-center justify-center gap-8 px-4 py-16">
           <div className="w-full">
+            <Link href="/">
+              <FontAwesomeIcon icon={faArrowAltCircleLeft} className="mr-2" />
+              All dashboards
+            </Link>
             <h1 className="w-full text-4xl font-extrabold tracking-tight">
               QuickLinks
             </h1>
             <div className="flex flex-row items-start gap-2">
-              <h2 className="text-2xl">{dashboardTitle}</h2>
+              <h2 className="text-2xl">{dashboard.data?.name}</h2>
               <DashboardOptions
                 onCardAdded={onCardAdded}
                 onDashboardUpdate={onDashboardUpdate}
-                title={dashboardTitle}
-                description={dashboardDescription}
+                title={dashboard.data?.name ?? ""}
+                description={dashboard.data?.description ?? ""}
                 dashboard={dashboardId}
               />
             </div>
           </div>
 
           <div className="grid w-full auto-rows-[12rem] grid-cols-6 gap-16">
-            {cardsQuery.data?.map((card, i) => (
-              <Card key={i} card={card} />
+            {widgetsQuery.isLoading && <p>Loading...</p>}
+            {widgetsQuery.isError && <p>Error</p>}
+            {widgetsQuery.data?.map((widget, i) => (
+              <Widget
+                key={i}
+                widget={{
+                  name: widget.name,
+                  description: widget.description || "",
+                  size: widget.size as "small" | "medium" | "large",
+                  url: widget.url,
+                }}
+              />
             ))}
+
+            {cardsQuery.isLoading && <p>Loading...</p>}
+            {cardsQuery.isError && <p>Error</p>}
+            {cardsQuery.data?.map((card, i) => (
+              <LinkCard key={i} card={card} />
+            ))}
+
+            {cardsQuery.data?.length === 0 &&
+              widgetsQuery?.data?.length === 0 && (
+                <div className="col-span-6 flex items-center justify-center">
+                  <p className="text-center text-gray-500">
+                    No links yet. Click the [...] button to add one.
+                  </p>
+                </div>
+              )}
           </div>
         </div>
         <CommandDialog

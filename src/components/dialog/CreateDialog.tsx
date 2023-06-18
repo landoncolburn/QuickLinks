@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/Input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import Card from "../Card";
+import Card from "../LinkCard";
 import { api } from "@/utils/api";
 import IconPickerInput from "../IconPicker";
 
@@ -29,7 +29,7 @@ const formSchema = z.object({
     .string()
     .url("Please enter a valid URL")
     .nonempty("Please enter a link"),
-  description: z.string().nonempty("Please enter a description"),
+  description: z.string().optional(),
   icon: z.string().nonempty("Please select an icon"),
   iconColor: z
     .string()
@@ -46,9 +46,9 @@ const placeholders = {
   link: "https://ietf.org",
   description:
     "The Internet Engineering Task Force is a non-profit standards organization.",
-  icon: "poo",
-  iconColor: "#ffffff",
-  backgroundColor: "#453225",
+  icon: "user",
+  iconColor: "#008CB4",
+  backgroundColor: "#53D5FD",
 };
 
 interface ICreateDialogProps {
@@ -99,7 +99,7 @@ function CreateDialog(props: ICreateDialogProps) {
       <Form {...form}>
         {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="space-y-8">
+          <div className="space-y-2">
             <FormField
               control={form.control}
               name="name"
@@ -149,80 +149,80 @@ function CreateDialog(props: ICreateDialogProps) {
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-3 gap-8">
-              <FormField
-                control={form.control}
-                name="iconColor"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Icon Color</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={placeholders.iconColor}
-                        {...field}
-                        type="color"
-                        className="h-16 w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="backgroundColor"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Background Color</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={placeholders.backgroundColor}
-                        {...field}
-                        type="color"
-                        className="h-16 w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="icon"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Icon</FormLabel>
-                    <FormControl>
-                      <IconPickerInput
-                        placeholder={placeholders.icon}
-                        changeIcon={(value: string) =>
-                          form.setValue("icon", value)
-                        }
-                        value={field.value}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-          <div className="mt-8">
-            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Preview
-            </label>
-            <div className="flex w-full justify-center">
-              <Card
-                card={{
-                  name: previewName || placeholders.name,
-                  iconColor: previewIconColor || placeholders.iconColor,
-                  backgroundColor:
-                    previewBackgroundColor || placeholders.backgroundColor,
-                  link: previewLink || placeholders.link,
-                  icon: previewIcon || placeholders.icon,
-                  description: previewDescription || placeholders.description,
-                }}
-              />
+            <div className="grid grid-cols-2 gap-8">
+              <div className="grid grid-rows-3">
+                <FormField
+                  control={form.control}
+                  name="iconColor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Icon Color</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={placeholders.iconColor}
+                          {...field}
+                          type="color"
+                          className="h-16 w-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="backgroundColor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Background Color</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={placeholders.backgroundColor}
+                          {...field}
+                          type="color"
+                          className="h-16 w-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="icon"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Icon</FormLabel>
+                      <FormControl>
+                        <IconPickerInput
+                          placeholder={placeholders.icon}
+                          changeIcon={(value: string) =>
+                            form.setValue("icon", value)
+                          }
+                          value={field.value}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="mt-8">
+                <div className="flex w-full justify-center">
+                  <Card
+                    card={{
+                      name: previewName || placeholders.name,
+                      iconColor: previewIconColor || placeholders.iconColor,
+                      backgroundColor:
+                        previewBackgroundColor || placeholders.backgroundColor,
+                      link: previewLink || placeholders.link,
+                      icon: previewIcon || placeholders.icon,
+                      description:
+                        previewDescription || placeholders.description,
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
           <DialogFooter>

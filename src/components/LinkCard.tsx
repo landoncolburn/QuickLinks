@@ -15,7 +15,7 @@ type Card = {
   iconColor: string;
   backgroundColor: string;
   link: string;
-  description: string;
+  description: string | null;
   icon: string;
 };
 

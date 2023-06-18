@@ -9,8 +9,7 @@ import {
 type Widget = {
   name: string;
   description: string;
-  textColor: string;
-  backgroundColor: string;
+  url: string;
   size: "small" | "medium" | "large";
 };
 
@@ -35,13 +34,14 @@ function Widget(props: IWidgetProps) {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div
-              className="mb-2 flex w-full flex-grow items-center justify-center rounded-lg border border-black/10 shadow"
-              style={{
-                backgroundColor: props.widget.backgroundColor,
-                color: props.widget.textColor,
-              }}
-            ></div>
+            <div className="mb-2 flex w-full flex-grow items-center justify-center overflow-clip rounded-lg border border-black/10 shadow">
+              <iframe
+                width="100%"
+                height="100%"
+                src={props.widget.url}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              ></iframe>
+            </div>
           </TooltipTrigger>
           <TooltipContent>
             <p>{props.widget.description}</p>

@@ -1,39 +1,28 @@
-import React, { useState } from "react";
+import React from "react";
 import { type NextPage } from "next";
 import Head from "next/head";
-import Card from "@/components/Card";
 import { api } from "@/utils/api";
-import DashboardOptions from "@/components/DashboardOptions";
-import Widget from "@/components/Widget";
-import Group from "@/components/Group";
-import QuickAction from "@/components/QuickAction";
-import { CommandDialog } from "@/components/ui/command";
-import { useHotkeys } from "react-hotkeys-hook";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { v4 as uuid } from "uuid";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
-  const cardsQuery = api.cards.getAll.useQuery();
+  const dashboardsQuery = api.dashboards.getAll.useQuery();
+  const deleteDashboard = api.dashboards.delete.useMutation();
+  const router = useRouter();
 
-  const [dashboardTitle, setDashboardTitle] = useState("Dashboard");
-  const [isQuickActionsOpen, setIsQuickActionsOpen] = React.useState(false);
-  const [dashboardDescription, setDashboardDescription] = useState(
-    "This is a dashboard."
-  );
-
-  useHotkeys("mod+k", () => setIsQuickActionsOpen(true));
-
-  async function onCardAdded(): Promise<void> {
-    await cardsQuery.refetch();
+  async function onDashboardCreate() {
+    const newId = uuid();
+    await router.push(`/dashboard/${newId}`);
   }
 
-  function onDashboardUpdate({
-    title,
-    description,
-  }: {
-    title: string;
-    description: string;
-  }): void {
-    setDashboardTitle(title);
-    setDashboardDescription(description);
+  async function onDashboardDelete(id: string) {
+    await deleteDashboard.mutateAsync({ id });
+    await dashboardsQuery.refetch();
   }
 
   return (
@@ -49,48 +38,58 @@ const Home: NextPage = () => {
             <h1 className="w-full text-4xl font-extrabold tracking-tight">
               QuickLinks
             </h1>
-            <div className="flex flex-row items-start gap-2">
-              <h2 className="text-2xl">{dashboardTitle}</h2>
-              <DashboardOptions
-                onCardAdded={onCardAdded}
-                onDashboardUpdate={onDashboardUpdate}
-                title={dashboardTitle}
-                description={dashboardDescription}
-              />
-            </div>
+            <h2 className="text-2xl">Dashboard Directory</h2>
           </div>
-
-          <div className="grid w-full auto-rows-[12rem] grid-cols-6 gap-16">
-            {cardsQuery.data?.map((card, i) => (
-              <Card key={i} card={card} />
-            ))}
-            <Widget
-              widget={{
-                name: "Widget",
-                description: "This is a widget.",
-                textColor: "#000000",
-                backgroundColor: "#FFFFFF",
-                size: "large",
-              }}
-            />
-            <Widget
-              widget={{
-                name: "Widget",
-                description: "This is a widget.",
-                textColor: "#000000",
-                backgroundColor: "#FFFFFF",
-                size: "medium",
-              }}
-            />
-            <Group name="Common Links" cards={cardsQuery.data ?? []} />
+          <div className="flex w-full max-w-2xl flex-col gap-8">
+            <Button
+              variant="ghost"
+              onClick={() => void onDashboardCreate()}
+              asChild
+            >
+              <Card className="flex w-full cursor-pointer flex-row items-center justify-between p-8">
+                <h1 className="text-lg font-bold">Create New Dashboard</h1>
+                <FontAwesomeIcon icon={faPlus} className="text-2xl" />
+              </Card>
+            </Button>
+            {dashboardsQuery.isLoading && <p>Loading...</p>}
+            {dashboardsQuery.isError && (
+              <p className="text-center text-red-500">
+                An error occured while fetching dashboards.
+              </p>
+            )}
+            {dashboardsQuery.data?.length === 0 && (
+              <p className="text-center text-gray-500">
+                No dashboards found. Create a new dashboard using the button
+                above.
+              </p>
+            )}
+            {dashboardsQuery.data
+              ?.sort((a, b) => b.createdAt.valueOf() - a.createdAt.valueOf())
+              .map((dashboard) => (
+                <Card
+                  key={dashboard.id}
+                  className="grid w-full grid-cols-4 p-6"
+                >
+                  <div className="col-span-3 flex flex-col">
+                    <h1 className="text-lg font-bold">{dashboard.name}</h1>
+                    <h2>ID: {dashboard.id}</h2>
+                    <h2>Created: {dashboard.createdAt.toDateString()}</h2>
+                  </div>
+                  <div className="flex w-full flex-col gap-2">
+                    <Button asChild>
+                      <Link href={`/dashboard/${dashboard.id}`}>Launch</Link>
+                    </Button>
+                    <Button
+                      onClick={() => void onDashboardDelete(dashboard.id)}
+                      variant="destructive"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </Card>
+              ))}
           </div>
         </div>
-        <CommandDialog
-          open={isQuickActionsOpen}
-          onOpenChange={setIsQuickActionsOpen}
-        >
-          <QuickAction />
-        </CommandDialog>
       </main>
     </>
   );

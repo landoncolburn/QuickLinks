@@ -32,6 +32,8 @@ import { Dialog } from "@/components/ui/Dialog";
 import ShareDialog from "@/components/dialog/ShareDialog";
 import CreateDialog from "@/components/dialog/CreateDialog";
 import EditDialog from "@/components/dialog/EditDialog";
+import CreateGroupDialog from "./dialog/CreateGroupDialog";
+import CreateWidgetDialog from "./dialog/CreateWidgetDialog";
 
 interface IDashboardOptionsProps {
   onCardAdded: () => Promise<void>;
@@ -40,21 +42,27 @@ interface IDashboardOptionsProps {
     description,
   }: {
     title: string;
-    description: string;
-  }) => void;
+    description?: string;
+  }) => Promise<any>;
   title: string;
-  description: string;
+  description?: string;
   dashboard: string;
 }
 
 function DashboardOptions(props: IDashboardOptionsProps) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
+  const [isCreateWidgetDialogOpen, setIsCreateWidgetDialogOpen] =
+    React.useState(false);
+  const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] =
+    React.useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = React.useState(false);
 
   function onDialogClose() {
     setIsCreateDialogOpen(false);
+    setIsCreateWidgetDialogOpen(false);
+    setIsCreateGroupDialogOpen(false);
     setIsEditDialogOpen(false);
     setIsDeleteDialogOpen(false);
     setIsShareDialogOpen(false);
@@ -66,9 +74,11 @@ function DashboardOptions(props: IDashboardOptionsProps) {
     description,
   }: {
     title: string;
-    description: string;
+    description?: string;
   }) {
     setIsCreateDialogOpen(false);
+    setIsCreateWidgetDialogOpen(false);
+    setIsCreateGroupDialogOpen(false);
     setIsEditDialogOpen(false);
     setIsDeleteDialogOpen(false);
     setIsShareDialogOpen(false);
@@ -101,6 +111,19 @@ function DashboardOptions(props: IDashboardOptionsProps) {
               <span>Create new card</span>
               <DropdownMenuShortcut>⇧⌘N</DropdownMenuShortcut>
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setIsCreateWidgetDialogOpen(true)}>
+              <FontAwesomeIcon icon={faSquarePlus} className="mr-4" />
+              <span>Create new widget</span>
+              <DropdownMenuShortcut>⇧⌘W</DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setIsCreateGroupDialogOpen(true)}>
+              <FontAwesomeIcon icon={faSquarePlus} className="mr-4" />
+              <span>Create new group</span>
+              <DropdownMenuShortcut>⇧⌘G</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
             <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
               <FontAwesomeIcon icon={faPenToSquare} className="mr-4" />
               <span>Edit dashboard</span>
@@ -127,6 +150,24 @@ function DashboardOptions(props: IDashboardOptionsProps) {
       </DropdownMenu>
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <CreateDialog onClose={onDialogClose} dashboard={props.dashboard} />
+      </Dialog>
+      <Dialog
+        open={isCreateWidgetDialogOpen}
+        onOpenChange={setIsCreateWidgetDialogOpen}
+      >
+        <CreateWidgetDialog
+          onClose={onDialogClose}
+          dashboard={props.dashboard}
+        />
+      </Dialog>
+      <Dialog
+        open={isCreateGroupDialogOpen}
+        onOpenChange={setIsCreateGroupDialogOpen}
+      >
+        <CreateGroupDialog
+          onClose={onDialogClose}
+          dashboard={props.dashboard}
+        />
       </Dialog>
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <EditDialog
