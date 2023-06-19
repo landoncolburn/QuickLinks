@@ -20,7 +20,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Card from "../LinkCard";
-import { api } from "@/utils/api";
 import IconPickerInput from "../IconPicker";
 
 const formSchema = z.object({
@@ -52,25 +51,22 @@ const placeholders = {
 };
 
 interface ICreateDialogProps {
-  onClose: () => void;
-  dashboard: string;
+  onClose: (
+    card: z.infer<typeof formSchema> & {
+      id: string;
+    }
+  ) => Promise<void>;
+  card: Card;
 }
 
-function CreateDialog(props: ICreateDialogProps) {
-  const createCard = api.cards.createCard.useMutation({
-    onSuccess: props.onClose,
-  });
-
+function EditCardDialog(props: ICreateDialogProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      link: "",
-      description: "",
-      icon: placeholders.icon,
-      iconColor: placeholders.iconColor,
-      backgroundColor: placeholders.backgroundColor,
+      ...props.card,
+      description: props.card.description || undefined,
     },
+    values: { ...props.card, description: props.card.description || undefined },
   });
 
   const previewName = form.watch("name");
@@ -83,18 +79,18 @@ function CreateDialog(props: ICreateDialogProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    await createCard.mutateAsync({ ...values, dashboard: props.dashboard });
-    console.log(props.dashboard);
+    await props.onClose({
+      ...values,
+      id: props.card.id,
+    });
     form.reset();
   }
 
   return (
     <DialogContent className="sm:max-w-2xl">
       <DialogHeader>
-        <DialogTitle>Create new card</DialogTitle>
-        <DialogDescription>
-          Create a new card and add it to your board.
-        </DialogDescription>
+        <DialogTitle>Edit card</DialogTitle>
+        <DialogDescription>Edit an existing card.</DialogDescription>
       </DialogHeader>
       <Form {...form}>
         {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
@@ -109,9 +105,7 @@ function CreateDialog(props: ICreateDialogProps) {
                   <FormControl>
                     <Input placeholder={placeholders.name} {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Choose a name for your card.
-                  </FormDescription>
+                  <FormDescription>Enter a name for your card.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -227,7 +221,7 @@ function CreateDialog(props: ICreateDialogProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">Create card</Button>
+            <Button type="submit">Save card</Button>
           </DialogFooter>
         </form>
       </Form>
@@ -235,4 +229,4 @@ function CreateDialog(props: ICreateDialogProps) {
   );
 }
 
-export default CreateDialog;
+export default EditCardDialog;

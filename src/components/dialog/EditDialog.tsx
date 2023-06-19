@@ -45,6 +45,10 @@ function EditDialog(props: IEditDialogProps) {
       title: props.title,
       description: props.description,
     },
+    values: {
+      title: props.title,
+      description: props.description,
+    },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {

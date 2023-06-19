@@ -18,6 +18,35 @@ export const cardsRouter = createTRPCRouter({
       });
       return result;
     }),
+  updateCard: publicProcedure
+    .input(
+      z.object({
+        id: z.string().uuid(),
+        name: z.string().min(1).max(255),
+        iconColor: z.string().startsWith("#").max(7),
+        backgroundColor: z.string().startsWith("#").max(7),
+        link: z.string().url(),
+        description: z.string().optional(),
+        icon: z.string().min(1).max(255),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const card = {
+        name: input.name,
+        iconColor: input.iconColor,
+        backgroundColor: input.backgroundColor,
+        link: input.link,
+        description: input.description,
+        icon: input.icon,
+      };
+
+      const result = await ctx.prisma.card.update({
+        where: { id: input.id },
+        data: card,
+      });
+
+      return result;
+    }),
   createCard: publicProcedure
     .input(
       z.object({
