@@ -6,7 +6,7 @@ import Head from "next/head";
 import LinkCard from "@/components/LinkCard";
 import DashboardOptions from "@/components/DashboardOptions";
 import QuickAction from "@/components/QuickAction";
-import { CommandDialog } from "@/components/ui/command";
+import { CommandDialog } from "@/components/ui/Command";
 import { useHotkeys } from "react-hotkeys-hook";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

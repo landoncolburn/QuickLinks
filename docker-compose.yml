@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  app:
+    image: t3-app
+    platform: "linux/amd64"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:/app/database/db.sqlite
+    volumes:
+      - ./database:/app/database/
