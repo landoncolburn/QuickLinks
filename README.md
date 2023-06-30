@@ -24,8 +24,10 @@ Second way, docker without compose:
 git clone https://github.com/landoncolburn/QuickLinks.git
 cd QuickLinks
 docker build -t quicklinks .
-docker run -p 3000:3000 -e DATABASE_URL="file:/app/database/db.sqlite" quicklinks
+docker run -p 3000:3000 -v "<PATH_TO_DATABASE>:/app/database" -e DATABASE_URL="file:/app/database/db.sqlite" quicklinks
 ```
+
+Make sure you replace <PATH_TO_DATABASE> with the absolute path to the db.sqlite file on your host system.
 
 The interface should be accessible at http://localhost:3000
 
