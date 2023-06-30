@@ -1,28 +1,50 @@
-# Create T3 App
+# QuickLinks
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+QuickLinks is my final project for Athabasca University's COMP 482 HCI class.
 
-## What's next? How do I make an app with this?
+The project is to design a user interface that meets planned task descriptions, and follows good design principles.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## How to run the application?
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+Three ways,
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+First using Docker Compose (reccomended):
 
-## Learn More
+```sh
+git clone https://github.com/landoncolburn/QuickLinks.git
+cd QuickLinks
+docker compose up
+```
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+The interface should be accessible at http://localhost:3000
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+Second way, docker without compose:
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+```sh
+git clone https://github.com/landoncolburn/QuickLinks.git
+cd QuickLinks
+docker build -t quicklinks .
+docker run -p 3000:3000 -e DATABASE_URL="file:../database/db.sqlite" quicklinks
+```
 
-## How do I deploy this?
+The interface should be accessible at http://localhost:3000
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+Third way, no docker:
+
+The application is tested on Node v18.15.0, so I reccomend using nvm or similar to use that runtime.
+
+Make sure you set the environment variable before running the application to point to the database.
+
+```sh
+git clone https://github.com/landoncolburn/QuickLinks.git
+cd QuickLinks
+npm i
+npm build
+DATABASE_URL="file:../database/db.sqlite" npm start
+```
+
+The interface should be accessible at http://localhost:3000
+
+If you have any trouble running the application, please feel free to reach out to me and I can make any required changes!
+
+Cheers!
